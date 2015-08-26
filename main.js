@@ -2,16 +2,14 @@
     window.addEventListener("load", function() {
       var canvas = document.querySelector("#robot-field");
       var robot = JSRobot(canvas);
-      robot.setSpeeds(50, 100);
-      robot.start();
-      window.setTimeout(function(){
+      robot.setSpeeds(100, 100);
+      robot.onHorizontal(200, function() {
+        robot.onHorizontal(0, function(){});
         robot.stop();
-        robot.setSpeeds(100, 100);
+        robot.setSpeeds(50, 100);
         robot.start();
-        window.setTimeout(function(){
-          robot.stop();          
-        }, 1000);
-      }, 3000);
+      });
+      robot.start();
     });
 }());
 
@@ -21,7 +19,7 @@ var JSRobot = JSRobot || function(canvas) {
   var startLocation = {x: 0, y: 0};
   var location = {x: startLocation.x, y: startLocation.y}
   context.translate(canvas.width/2, canvas.height/2);
-  startDirection = 0;
+  var startDirection = 0;
   var direction = startDirection;
   var vr = 100;
   var vl = 0;
@@ -29,12 +27,20 @@ var JSRobot = JSRobot || function(canvas) {
 //   var r = d * (vr+vl) / (vr-vl);
   var startTime;
   var started = false;
+  var absoluteDirection = startDirection + direction;
+  var absoluteLocation = {
+    x: startLocation.x + location.x,
+    y: startLocation.y + location.y
+  }
+  var previous = {
+    absoluteDirection: 0,
+    absoluteLocation: {x: 0, y: 0}
+  };
   var loop = function() {
+      window.requestAnimationFrame(loop);  
       if(!started) {
         return;
       }
-      render();   
-      window.requestAnimationFrame(loop);  
       if(!startTime) {
         startTime = Date.now();
       }
@@ -50,11 +56,24 @@ var JSRobot = JSRobot || function(canvas) {
         location.x = (v * Math.sin(t*va)/va);
         location.y = ((-v * Math.cos(t*va)/(va)) + (v/va));
       }
-      
+      absoluteDirection = startDirection + direction;
+      absoluteLocation = {
+        x: startLocation.x + location.x,
+        y: startLocation.y + location.y
+      };
+      // Invoke events
+      if((absoluteLocation.x >= horizontalLimit && previous.absoluteLocation.x < horizontalLimit)
+        ||(absoluteLocation.x <= horizontalLimit && previous.absoluteLocation.x > horizontalLimit)) {
+        horizontalCallback();    
+      }
+      // Record previous
+      previous.absoluteDirection = startDirection + direction;
+      previous.absoluteLocation.x = startLocation.x + location.x;
+      previous.absoluteLocation.y = startLocation.y + location.y;
+      render();   
   };
 
   var render = function() {
-      
       var drawHead = function() {
           context.strokeStyle = "silver";
           context.fillStyle = "blue";
@@ -125,10 +144,13 @@ var JSRobot = JSRobot || function(canvas) {
       context.restore();
             
   };
-
+  var horizontalLimit;
+  var horizontalCallback;
   that.onHorizontal = function(limit, callback) {
-
+    horizontalLimit = limit;
+    horizontalCallback = callback;
   };
+  
   that.onVertical = function(limit, callback) {
 
   };
@@ -142,19 +164,22 @@ var JSRobot = JSRobot || function(canvas) {
   };
 
   that.stop = function() {
-    started = false;
+    window.setTimeout(function() {
+      started = false;    
+    }, 0);
   };
 
   that.start = function() {
-    started = true;
-    startTime = Date.now();
-    startLocation.x = location.x;
-    startLocation.y = location.y;
-    startDirection = direction;
-    loop();  
+    window.setTimeout(function() {
+      started = true;
+      startTime = Date.now();
+      startLocation.x = location.x;
+      startLocation.y = location.y;
+      startDirection = direction;      
+    }, 0);
   };
   
-  render();
+  loop();
 
   return that;      
 };
