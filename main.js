@@ -1,18 +1,3 @@
-(function(){
-    window.addEventListener("load", function() {
-      var canvas = document.querySelector("#robot-field");
-      var robot = JSRobot(canvas);
-      robot.setSpeeds(100, 100);
-      robot.onHorizontal(200, function() {
-        robot.onHorizontal(0, function(){});
-        robot.stop();
-        robot.setSpeeds(50, 100);
-        robot.start();
-      });
-      robot.start();
-    });
-}());
-
 var JSRobot = JSRobot || function(canvas) {
   var that = {};
   var context = canvas.getContext("2d");
@@ -24,7 +9,6 @@ var JSRobot = JSRobot || function(canvas) {
   var vr = 100;
   var vl = 0;
   var d = 70;
-//   var r = d * (vr+vl) / (vr-vl);
   var startTime;
   var started = false;
   var absoluteDirection = startDirection + direction;
@@ -37,8 +21,8 @@ var JSRobot = JSRobot || function(canvas) {
     absoluteLocation: {x: 0, y: 0}
   };
   var loop = function() {
-      window.requestAnimationFrame(loop);  
       if(!started) {
+        window.requestAnimationFrame(loop);  
         return;
       }
       if(!startTime) {
@@ -56,21 +40,31 @@ var JSRobot = JSRobot || function(canvas) {
         location.x = (v * Math.sin(t*va)/va);
         location.y = ((-v * Math.cos(t*va)/(va)) + (v/va));
       }
-      absoluteDirection = startDirection + direction;
-      absoluteLocation = {
-        x: startLocation.x + location.x,
-        y: startLocation.y + location.y
-      };
+      absoluteDirection = (startDirection + direction) % 360;
+      absoluteLocation.x = startLocation.x + Math.cos(startDirection*Math.PI/180) * location.x - Math.cos((90-startDirection)*Math.PI/180) * location.y;
+      absoluteLocation.y = startLocation.y + Math.sin(startDirection*Math.PI/180) * location.x + Math.sin((90-startDirection)*Math.PI/180) * location.y;
       // Invoke events
-      if((absoluteLocation.x >= horizontalLimit && previous.absoluteLocation.x < horizontalLimit)
-        ||(absoluteLocation.x <= horizontalLimit && previous.absoluteLocation.x > horizontalLimit)) {
-        horizontalCallback();    
+      if(moveCallback) {
+        moveCallback(
+        {
+          previous: {
+            x: previous.absoluteLocation.x,
+            y: previous.absoluteLocation.y,
+            direction: previous.absoluteDirection                
+          },
+          current: {
+            x: absoluteLocation.x,
+            y: absoluteLocation.y,
+            direction: absoluteDirection                
+          }
+        });
       }
       // Record previous
-      previous.absoluteDirection = startDirection + direction;
-      previous.absoluteLocation.x = startLocation.x + location.x;
-      previous.absoluteLocation.y = startLocation.y + location.y;
+      previous.absoluteDirection = absoluteDirection;
+      previous.absoluteLocation.x = absoluteLocation.x;
+      previous.absoluteLocation.y = absoluteLocation.y;
       render();   
+      window.requestAnimationFrame(loop);  
   };
 
   var render = function() {
@@ -144,41 +138,59 @@ var JSRobot = JSRobot || function(canvas) {
       context.restore();
             
   };
-  var horizontalLimit;
-  var horizontalCallback;
-  that.onHorizontal = function(limit, callback) {
-    horizontalLimit = limit;
-    horizontalCallback = callback;
+  var moveCallback;
+  that.onMove = function(callback) {
+    moveCallback = callback;
   };
   
-  that.onVertical = function(limit, callback) {
-
-  };
-  that.onDirection = function(limit, callback) {
-
-  };
-
   that.setSpeeds = function(left, right) {
-    vl = left;
-    vr = right;
+    window.setTimeout(function() {
+      syncStop();
+      vl = left;
+      vr = right;
+      syncStart();
+    }, 0);
+  };
+
+  var syncStop = function() {
+    started = false; 
   };
 
   that.stop = function() {
     window.setTimeout(function() {
-      started = false;    
+      syncStop();  
     }, 0);
+  };
+
+  var syncStart = function() {
+      started = true;
+      startTime = Date.now();
+      startLocation.x = absoluteLocation.x;
+      startLocation.y = absoluteLocation.y;
+      startDirection = absoluteDirection;      
   };
 
   that.start = function() {
     window.setTimeout(function() {
-      started = true;
-      startTime = Date.now();
-      startLocation.x = location.x;
-      startLocation.y = location.y;
-      startDirection = direction;      
+      syncStart();
     }, 0);
   };
   
+  that.isX = function(x) {
+    return is(x, previous.absoluteLocation.x, absoluteLocation.x);
+  };
+  that.isY = function(y) {
+    return is(y, previous.absoluteLocation.y, absoluteLocation.y);
+  };
+  that.isDirection = function(direction) {
+    return is(direction, previous.absoluteDirection, absoluteDirection)
+        || (Math.abs(previous.absoluteDirection - absoluteDirection) > 180 && is(direction, previous.absoluteDirection-360, absoluteDirection));
+  };
+  var is = function(limit, one, other) {
+      return((one < limit && other >= limit)
+        ||(one > limit && other <= limit));
+  }
+
   loop();
 
   return that;      
