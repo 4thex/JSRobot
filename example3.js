@@ -1,8 +1,8 @@
 (function(){
     window.addEventListener("load", function() {
       var canvas = document.querySelector("#robot-field");
-      var robot1 = JSRobot(canvas, {x: -50, y: 0});
-      var robot2 = JSRobot(canvas, {x: -100, y: -150});
+      var robot1 = JSRobot(canvas, {x: -50, y: 0}, "blue");
+      var robot2 = JSRobot(canvas, {x: -100, y: -150}, "red");
       var state = 0;
       var speed = 200;
       robot1.setSpeeds(speed, speed);

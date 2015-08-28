@@ -1,8 +1,9 @@
-var JSRobot = JSRobot || function(canvas, startLocation) {
+var JSRobot = JSRobot || function(canvas, startLocation, color) {
   var that = {};
   var context = canvas.getContext("2d");
   var startLocation = startLocation || {x: 0, y: 0};
   var location = {x: startLocation.x, y: startLocation.y};
+  var color = color || "blue";
   var startDirection = 0;
   var direction = startDirection;
   var vr = 100;
@@ -69,7 +70,7 @@ var JSRobot = JSRobot || function(canvas, startLocation) {
   var render = function() {
       var drawHead = function() {
           context.strokeStyle = "silver";
-          context.fillStyle = "blue";
+          context.fillStyle = color;
           context.beginPath();
           context.arc(0, 0, 50, 0, Math.PI * 2);
           context.stroke();  
@@ -117,13 +118,21 @@ var JSRobot = JSRobot || function(canvas, startLocation) {
           context.stroke();          
       };  
 
+      var clear = function() {
+        context.save();
+        context.translate(previous.absoluteLocation.x, previous.absoluteLocation.y);
+        context.rotate(previous.absoluteDirection * Math.PI/180);
+        context.clearRect(-75, -75, 150, 150);
+        context.restore();      
+      };
+
       context.save();
       context.translate(canvas.width/2, canvas.height/2);
+      clear();
       context.translate(startLocation.x, startLocation.y);
       context.rotate(startDirection * Math.PI/180);
       context.translate(location.x,location.y);
       context.rotate(direction * Math.PI /180);
-      context.clearRect(-75, -75, 150, 150);
       drawHead();
 
       context.save();
