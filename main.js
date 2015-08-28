@@ -1,9 +1,8 @@
-var JSRobot = JSRobot || function(canvas) {
+var JSRobot = JSRobot || function(canvas, startLocation) {
   var that = {};
   var context = canvas.getContext("2d");
-  var startLocation = {x: 0, y: 0};
-  var location = {x: startLocation.x, y: startLocation.y}
-  context.translate(canvas.width/2, canvas.height/2);
+  var startLocation = startLocation || {x: 0, y: 0};
+  var location = {x: startLocation.x, y: startLocation.y};
   var startDirection = 0;
   var direction = startDirection;
   var vr = 100;
@@ -119,14 +118,12 @@ var JSRobot = JSRobot || function(canvas) {
       };  
 
       context.save();
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.restore();
-      context.save();
+      context.translate(canvas.width/2, canvas.height/2);
       context.translate(startLocation.x, startLocation.y);
       context.rotate(startDirection * Math.PI/180);
       context.translate(location.x,location.y);
       context.rotate(direction * Math.PI /180);
+      context.clearRect(-75, -75, 150, 150);
       drawHead();
 
       context.save();
