@@ -2,7 +2,7 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
   var that = {};
   var context = canvas.getContext("2d");
   var startLocation = startLocation || {x: 0, y: 0};
-  var location = {x: startLocation.x, y: startLocation.y};
+  var location = {x: 0, y: 0};
   var color = color || "blue";
   var startDirection = 0;
   var direction = startDirection;
@@ -11,20 +11,20 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
   var d = 70;
   var startTime;
   var started = false;
-  var absoluteDirection = startDirection + direction;
+  var absoluteDirection = startDirection;
   var absoluteLocation = {
-    x: startLocation.x + location.x,
-    y: startLocation.y + location.y
+    x: startLocation.x,
+    y: startLocation.y
   }
   var previous = {
-    absoluteDirection: 0,
-    absoluteLocation: {x: 0, y: 0}
+    absoluteDirection: startDirection,
+    absoluteLocation: {x: startLocation.x, y: startLocation.y}
   };
-  var loop = function() {
+  that.calculate = function() {
       if(!started) {
-        window.requestAnimationFrame(loop);  
         return;
       }
+
       if(!startTime) {
         startTime = Date.now();
       }
@@ -62,12 +62,10 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
       // Record previous
       previous.absoluteDirection = absoluteDirection;
       previous.absoluteLocation.x = absoluteLocation.x;
-      previous.absoluteLocation.y = absoluteLocation.y;
-      render();   
-      window.requestAnimationFrame(loop);  
+      previous.absoluteLocation.y = absoluteLocation.y;  
   };
 
-  var render = function() {
+  that.render = function() {
       var drawHead = function() {
           context.strokeStyle = "silver";
           context.fillStyle = color;
@@ -118,17 +116,8 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
           context.stroke();          
       };  
 
-      var clear = function() {
-        context.save();
-        context.translate(previous.absoluteLocation.x, previous.absoluteLocation.y);
-        context.rotate(previous.absoluteDirection * Math.PI/180);
-        context.clearRect(-75, -75, 150, 150);
-        context.restore();      
-      };
-
       context.save();
       context.translate(canvas.width/2, canvas.height/2);
-      clear();
       context.translate(startLocation.x, startLocation.y);
       context.rotate(startDirection * Math.PI/180);
       context.translate(location.x,location.y);
@@ -150,7 +139,7 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
   };
   
   that.setSpeeds = function(left, right) {
-    window.setTimeout(function() {
+    window.requestAnimationFrame(function() {
       syncStop();
       vl = left;
       vr = right;
@@ -196,8 +185,6 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
       return((one < limit && other >= limit)
         ||(one > limit && other <= limit));
   }
-
-  loop();
 
   return that;      
 };
