@@ -14,9 +14,6 @@
       robot2.setSpeeds(-speed/3, -speed);
       robot3.setSpeeds(-speed/3, speed/3);
 
-      robot1.start();
-      robot2.start();
-
       robot1.onMove(function(location) {
           switch(state) {
               case 0:
