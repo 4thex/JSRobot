@@ -26,12 +26,12 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
       }
 
       if(!startTime) {
-        startTime = Date.now();
+        startTime = performance.now();
       }
       // Active operation
       var va = (vr-vl)/(2*d);
       var v = (vr+vl)/2;
-      var t = (Date.now() - startTime)/1000;
+      var t = (performance.now() - startTime)/1000;
       direction = (360 * (t * va) / (Math.PI*2));
       if(va === 0) {
         location.x = (v * t);
@@ -144,7 +144,7 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
       vl = left;
       vr = right;
       syncStart();
-    }, 0);
+    });
   };
 
   var syncStop = function() {
@@ -152,14 +152,14 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
   };
 
   that.stop = function() {
-    window.setTimeout(function() {
+    window.requestAnimationFrame(function() {
       syncStop();  
-    }, 0);
+    });
   };
 
   var syncStart = function() {
       started = true;
-      startTime = Date.now();
+      startTime = performance.now();
       startLocation.x = absoluteLocation.x;
       startLocation.y = absoluteLocation.y;
       startDirection = absoluteDirection;      
