@@ -20,18 +20,18 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
     absoluteDirection: startDirection,
     absoluteLocation: {x: startLocation.x, y: startLocation.y}
   };
-  that.calculate = function() {
-      if(!started) {
+  that.calculate = function(time) {
+      if(!started || startTime > time) {
         return;
       }
 
       if(!startTime) {
-        startTime = performance.now();
+        startTime = time;
       }
       // Active operation
       var va = (vr-vl)/(2*d);
       var v = (vr+vl)/2;
-      var t = (performance.now() - startTime)/1000;
+      var t = (time - startTime)/1000;
       direction = (360 * (t * va) / (Math.PI*2));
       if(va === 0) {
         location.x = (v * t);
@@ -140,35 +140,25 @@ var JSRobot = JSRobot || function(canvas, startLocation, color) {
   
   that.setSpeeds = function(left, right) {
     window.requestAnimationFrame(function() {
-      syncStop();
+      that.stop();
       vl = left;
       vr = right;
-      syncStart();
+      that.start();
     });
-  };
-
-  var syncStop = function() {
-    started = false; 
   };
 
   that.stop = function() {
-    window.requestAnimationFrame(function() {
-      syncStop();  
-    });
-  };
-
-  var syncStart = function() {
-      started = true;
-      startTime = performance.now();
-      startLocation.x = absoluteLocation.x;
-      startLocation.y = absoluteLocation.y;
-      startDirection = absoluteDirection;      
+    started = false; 
   };
 
   that.start = function() {
-    window.setTimeout(function() {
-      syncStart();
-    }, 0);
+    window.requestAnimationFrame(function() {
+      started = true;
+      startTime = undefined;
+      startLocation.x = absoluteLocation.x;
+      startLocation.y = absoluteLocation.y;
+      startDirection = absoluteDirection;            
+    });
   };
   
   that.isX = function(x) {

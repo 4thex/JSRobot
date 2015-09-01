@@ -9,7 +9,7 @@ var Field = Field || function(canvas) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     context.strokeStyle = "white";
-    context.lineWidth = 1;
+    context.lineWidth = 2;
     context.beginPath();
     context.moveTo(0, 500);
     context.lineTo(1000, 500);
@@ -25,10 +25,21 @@ var Field = Field || function(canvas) {
     context.stroke();
     context.restore();
   };
-  var animate = function() {
+  var last;
+  var stopped = 0;
+  var animate = function(time) {
+    if(last === time) {
+      return;
+    }
+    last = last || time;
+    var diff = time-last;
+    last = time;
+    if(diff>300) {
+      stopped += diff;
+    }
     render();
     robots.forEach(function(robot) {
-       robot.calculate();
+       robot.calculate(time-stopped);
        context.save();
        robot.render(); 
        context.restore();
