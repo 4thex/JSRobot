@@ -2,9 +2,9 @@
     window.addEventListener("load", function() {
       var canvas = document.querySelector("#robot-field");
       var field = Field(canvas);
-      var robot1 = JSRobot(canvas, {x: 0, y: 0}, "blue");
-      var robot2 = JSRobot(canvas, {x: -100, y: -100}, "red");
-      var robot3 = JSRobot(canvas, {x: 300, y: -300}, "yellow");
+      var robot1 = JSRobot({x: 0, y: 0}, "blue");
+      var robot2 = JSRobot({x: -100, y: -100}, "red");
+      var robot3 = JSRobot({x: 300, y: -300}, "yellow");
       field.add(robot1);
       field.add(robot2);
       field.add(robot3);

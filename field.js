@@ -41,7 +41,7 @@ var Field = Field || function(canvas) {
     robots.forEach(function(robot) {
        robot.calculate(time-stopped);
        context.save();
-       robot.render(); 
+       robot.render(context); 
        context.restore();
     });  
     window.requestAnimationFrame(animate);

@@ -1,7 +1,10 @@
 (function(){
     window.addEventListener("load", function() {
       var canvas = document.querySelector("#robot-field");
-      var robot = JSRobot(canvas);
+      var field = Field(canvas);
+
+      var robot = JSRobot();
+      field.add(robot);
       var state = 0;
       var speed = 100;
       robot.onMove(function(location) {
