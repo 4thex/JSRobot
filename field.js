@@ -1,5 +1,15 @@
 var Field = Field || function(canvas) {
   var that = {};
+  if(!canvas) {
+    canvas = document.querySelector("canvas");
+  }
+  if(!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.height = 1000;
+    canvas.width = 1000;
+    var body = document.querySelector("body");
+    body.appendChild(canvas);    
+  }
   var context = canvas.getContext("2d");
 
   var robots = [];
