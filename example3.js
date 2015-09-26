@@ -1,6 +1,11 @@
 (function(){
     window.addEventListener("load", function() {
       var canvas = document.querySelector("#robot-field");
+      canvas.addEventListener("click", function() {
+        var image = document.querySelector("#snapshot");
+        image.src = canvas.toDataURL();
+      });
+      
       var field = Field(canvas);
       var robot1 = JSRobot({x: 0, y: 0}, "blue");
       var robot2 = JSRobot({x: -100, y: -100}, "red");
