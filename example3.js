@@ -24,7 +24,7 @@
               case 0:
                 if(robot1.isX(300)) {
                     state = 1;
-                    robot1.setSpeeds(0, speed);
+                    robot1.setSpeeds(speed, 0);
                 }
                 break;
               case 1:
@@ -36,7 +36,7 @@
               case 2:
                 if(robot1.isX(0)) {
                     state = 3;
-                    robot1.setSpeeds(-speed/3, speed/3);
+                    robot1.setSpeeds(speed/3, -speed/3);
                 }
                 break;
               case 3:
@@ -48,7 +48,7 @@
               case 4:
                 if(robot1.isY(0)) {
                     state = 5;
-                    robot1.setSpeeds(-speed/3, speed/3);
+                    robot1.setSpeeds(speed/3, -speed/3);
                 }
                 break;
               case 5:

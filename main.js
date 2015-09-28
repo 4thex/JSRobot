@@ -28,7 +28,7 @@ var JSRobot = JSRobot || function(startLocation, color) {
         startTime = time;
       }
       // Active operation
-      var va = (vr-vl)/(2*d);
+      var va = (vl-vr)/(2*d);
       var v = (vr+vl)/2;
       var t = (time - startTime)/1000;
       direction = (360 * (t * va) / (Math.PI*2));
